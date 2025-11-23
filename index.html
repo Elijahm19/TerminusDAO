@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminus DAO</title>
+    <link rel="icon" type="image/png" href="images/logo/main_logo.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header and Navigation -->
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <img src="images/logo/main_logo.png" alt="Terminus DAO" class="logo">
+                </div>
+
+                <!-- Hamburger Menu Icon for Mobile -->
+                <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+                <!-- Navigation Links -->
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#mission">Our Mission</a></li>
+                    <li><a href="#events">Events</a></li>
+                    <li><a href="#sponsors">Sponsors</a></li>
+                </ul>
+
+                <!-- Theme Toggle -->
+                <div class="nav-actions">
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-video-container">
+            <video class="hero-video" autoplay muted loop playsinline>
+                <source src="images/hero/New video hero.mp4" type="video/mp4">
+                <!-- Fallback image for browsers that don't support video -->
+                <img src="images/hero/main_hero.png" alt="Terminus DAO - Atlanta's Decentralized Web3 Community">
+            </video>
+            <div class="hero-overlay">
+                <div class="hero-content">
+                    <h1 class="hero-title">Welcome to Terminus DAO</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Our Mission Section -->
+    <section id="mission" class="section">
+        <div class="container">
+            <h2 class="section-title fade-in">Our Mission</h2>
+            <div class="mission-content">
+                <p class="mission-text fade-in-left">
+                    To empower the Atlanta blockchain community through decentralized governance, collective ownership, and equitable access to resources, enabling builders, creators, and innovators to shape the city's Web3 future from the ground up.
+                </p>
+                <p class="mission-text fade-in-right">
+                    We envision a self-sustaining, community-led DAO that serves as a blueprint for inclusive, transparent, and impactful blockchain collaboration; where every member has a voice, every project has a path, and every action contributes to making Atlanta a global Web3 capital.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upcoming Events Section -->
+    <section id="events" class="section section-alt">
+        <div class="container">
+            <h2 class="section-title fade-in">Upcoming Events</h2>
+
+            <!-- Events will be dynamically inserted here -->
+            <div id="eventsList" class="events-list">
+                <!-- Events loaded from events.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Sponsors Section -->
+    <section id="sponsors" class="section">
+        <div class="container">
+            <h2 class="section-title fade-in">Our Sponsors</h2>
+            <p class="section-intro fade-in">Thank you to our sponsors for supporting our mission and helping build the Web3 ecosystem in Atlanta.</p>
+
+            <!-- Sponsors will be dynamically inserted here -->
+            <div id="sponsorsTable"></div>
+
+            <div class="sponsors-cta fade-in">
+                <p>Interested in becoming a sponsor?</p>
+                <a href="mailto:contact@terminusdao.com" class="btn-secondary">Become a Sponsor</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 Terminus DAO</p>
+            <p>
+                <a href="https://atlantachain.io/events" target="_blank" rel="noopener noreferrer">Events</a> |
+                <a href="mailto:contact@terminusdao.com">Contact</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="events.js"></script>
+    <script src="sponsors.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
