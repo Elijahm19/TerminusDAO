@@ -724,6 +724,56 @@ header {
     color: var(--text-primary);
 }
 
+/* Event Image Styles */
+.event-image-container {
+    margin-bottom: 1.5rem;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.event-image {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.event-card:hover .event-image {
+    transform: scale(1.02);
+}
+
+/* Location Link Styles */
+.location-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.location-link:hover {
+    color: var(--accent-primary);
+}
+
+.location-icon {
+    flex-shrink: 0;
+}
+
+.map-link-text {
+    font-size: 0.85rem;
+    color: var(--accent-secondary);
+    margin-left: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.location-link:hover .map-link-text {
+    opacity: 1;
+}
+
 .events-cta {
     text-align: center;
     position: relative;
@@ -905,6 +955,19 @@ header {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .nav-container {
+        justify-content: space-between;
+    }
+
+    .nav-brand {
+        min-width: auto;
+        flex: 0 0 auto;
+    }
+
+    .nav-brand .logo {
+        height: 50px;
+    }
+
     .nav-menu {
         position: absolute;
         top: 100%;
@@ -929,10 +992,14 @@ header {
 
     .hamburger {
         display: flex;
+        order: 3;
     }
 
     .nav-actions {
         gap: 0.5rem;
+        min-width: auto;
+        flex: 0 0 auto;
+        order: 2;
     }
 
     .hero-image {

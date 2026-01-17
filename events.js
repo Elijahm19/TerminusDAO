@@ -1,79 +1,86 @@
 // Events Data
-// HOW TO MANAGE EVENTS:
-// 1. To add an event: Copy an event object and update the fields
-// 2. To remove an event: Delete the entire event object (including the curly braces and comma)
-// 3. Recurring events: Set recurring: true - these always show up
-// 4. One-time events: Set recurring: false and provide a dateString (YYYY-MM-DD format)
-// 5. Past events are automatically filtered out (except recurring ones)
+// This file now fetches events from Firebase Firestore
+// Fallback events are used if Firestore is not available
 
-const events = [
-    // RECURRING EVENTS (always displayed)
+// Fallback events (used when Firestore is unavailable)
+const fallbackEvents = [
     {
         title: "Off The Chain Thursdays",
         date: "Every Thursday @ 6:30 PM",
-        dateString: null, // null for recurring events
+        dateString: null,
         recurring: true,
-        location: "Atlanta Blockchain Center",
+        location: { name: "Atlanta Blockchain Center" },
         description: "Join us for our weekly networking event. Connect with blockchain enthusiasts, developers, and entrepreneurs in the Atlanta Web3 community."
-    },
-
-    // UPCOMING ONE-TIME EVENTS (add new events here)
-    // Template for adding new events:
-    // {
-    //     title: "Event Name",
-    //     date: "Month DD, YYYY @ HH:MM AM/PM",
-    //     dateString: "YYYY-MM-DD",  // Used for sorting and filtering
-    //     recurring: false,
-    //     location: "Venue Name",
-    //     description: "Event description here"
-    // },
-
-    {
-        title: "Blockchain 101 Workshop",
-        date: "November 10, 2025 @ 5:00 PM",
-        dateString: "2025-11-10",
-        recurring: false,
-        location: "Atlanta Blockchain Center",
-        description: "New to blockchain? This beginner-friendly workshop covers the fundamentals of blockchain technology, cryptocurrencies, and Web3."
-    },
-    {
-        title: "Web3 Pitchfest Atlanta",
-        date: "December 5, 2025 @ 6:00 PM",
-        dateString: "2025-12-05",
-        recurring: false,
-        location: "Atlanta Blockchain Center",
-        description: "Annual pitching competition for Web3 startups. Watch innovative projects compete for prizes and community support."
-    },
-    {
-        title: "Smart Contract Development Bootcamp",
-        date: "December 12, 2025 @ 2:00 PM",
-        dateString: "2025-12-12",
-        recurring: false,
-        location: "Atlanta Blockchain Center",
-        description: "Deep dive into Solidity and smart contract development. Learn to build, test, and deploy your first smart contracts."
-    },
-    {
-        title: "DAO Governance Workshop",
-        date: "January 15, 2026 @ 6:00 PM",
-        dateString: "2026-01-15",
-        recurring: false,
-        location: "Atlanta Blockchain Center",
-        description: "Learn about decentralized governance, voting mechanisms, and how Terminus DAO operates. Open to all community members."
     }
 ];
 
+// Function to fetch events from Firestore
+async function fetchEventsFromFirestore() {
+    // Check if Firebase is initialized
+    if (typeof db === 'undefined') {
+        console.warn('Firestore not available, using fallback events');
+        return fallbackEvents;
+    }
+
+    try {
+        const snapshot = await db.collection('events').get();
+
+        if (snapshot.empty) {
+            console.log('No events in Firestore, using fallback events');
+            return fallbackEvents;
+        }
+
+        const events = [];
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            events.push({
+                id: doc.id,
+                title: data.title,
+                date: formatEventDateDisplay(data.date, data.displayTime, data.recurring),
+                dateString: data.date,
+                recurring: data.recurring || false,
+                location: data.location,
+                description: data.description,
+                imageUrl: data.imageUrl || null,
+                link: data.link || null
+            });
+        });
+
+        return events;
+
+    } catch (error) {
+        console.error('Error fetching events from Firestore:', error);
+        return fallbackEvents;
+    }
+}
+
+// Format date for display
+function formatEventDateDisplay(dateStr, displayTime, recurring) {
+    if (recurring) {
+        return displayTime ? `Every event @ ${displayTime}` : 'Recurring Event';
+    }
+
+    if (!dateStr) return 'Date TBD';
+
+    const date = new Date(dateStr + 'T00:00:00');
+    const options = { month: 'long', day: 'numeric', year: 'numeric' };
+    const formatted = date.toLocaleDateString('en-US', options);
+
+    return displayTime ? `${formatted} @ ${displayTime}` : formatted;
+}
+
 // Function to filter and sort events
-function getUpcomingEvents() {
+function getUpcomingEvents(events) {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to start of day for comparison
+    today.setHours(0, 0, 0, 0);
 
     // Filter out past events (keep recurring events)
     const upcomingEvents = events.filter(event => {
         if (event.recurring) {
-            return true; // Always show recurring events
+            return true;
         }
         if (!event.dateString) {
-            return true; // Show events without dates
+            return true;
         }
         const eventDate = new Date(event.dateString);
         return eventDate >= today;
@@ -81,11 +88,8 @@ function getUpcomingEvents() {
 
     // Sort events: recurring first, then by date
     upcomingEvents.sort((a, b) => {
-        // Recurring events come first
         if (a.recurring && !b.recurring) return -1;
         if (!a.recurring && b.recurring) return 1;
-
-        // Both recurring or both not recurring, sort by date
         if (!a.dateString || !b.dateString) return 0;
         return new Date(a.dateString) - new Date(b.dateString);
     });
@@ -93,8 +97,26 @@ function getUpcomingEvents() {
     return upcomingEvents;
 }
 
+// Generate Google Maps link
+function getGoogleMapsLink(location) {
+    if (!location) return null;
+
+    // If we have coordinates, use them
+    if (location.lat && location.lng) {
+        return `https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}`;
+    }
+
+    // Otherwise, search by name/address
+    const searchQuery = location.address || location.name || location;
+    if (typeof searchQuery === 'string') {
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`;
+    }
+
+    return null;
+}
+
 // Function to render events
-function renderEvents() {
+async function renderEvents() {
     const eventsList = document.getElementById('eventsList');
 
     if (!eventsList) {
@@ -102,11 +124,15 @@ function renderEvents() {
         return;
     }
 
-    // Clear existing content
-    eventsList.innerHTML = '';
+    // Show loading state
+    eventsList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Loading events...</p>';
 
-    // Get filtered and sorted upcoming events
-    const upcomingEvents = getUpcomingEvents();
+    // Fetch events from Firestore
+    const allEvents = await fetchEventsFromFirestore();
+    const upcomingEvents = getUpcomingEvents(allEvents);
+
+    // Clear loading state
+    eventsList.innerHTML = '';
 
     // Check if there are events
     if (upcomingEvents.length === 0) {
@@ -119,13 +145,37 @@ function renderEvents() {
         const eventCard = document.createElement('div');
         eventCard.className = 'event-card fade-in';
 
-        let cardHTML = `
-            <h3 class="event-title">${event.title}</h3>
-            <p class="event-date">${event.date}</p>
-        `;
+        // Get location display name
+        const locationName = event.location?.name || event.location || '';
+        const mapsLink = getGoogleMapsLink(event.location);
 
-        if (event.location) {
-            cardHTML += `<p class="event-location">📍 ${event.location}</p>`;
+        let cardHTML = '';
+
+        // Add image if available
+        if (event.imageUrl) {
+            cardHTML += `
+                <div class="event-image-container">
+                    <img src="${event.imageUrl}" alt="${event.title}" class="event-image">
+                </div>
+            `;
+        }
+
+        cardHTML += `<h3 class="event-title">${event.title}</h3>`;
+        cardHTML += `<p class="event-date">${event.date}</p>`;
+
+        if (locationName) {
+            if (mapsLink) {
+                cardHTML += `
+                    <p class="event-location">
+                        <a href="${mapsLink}" target="_blank" rel="noopener noreferrer" class="location-link">
+                            <span class="location-icon">📍</span> ${locationName}
+                            <span class="map-link-text">View on Map</span>
+                        </a>
+                    </p>
+                `;
+            } else {
+                cardHTML += `<p class="event-location">📍 ${locationName}</p>`;
+            }
         }
 
         if (event.description) {

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Terminus DAO</title>
+    <link rel="icon" type="image/png" href="images/logo/main_logo.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="admin-header-content">
+            <a href="index.html" class="admin-logo">
+                <img src="images/logo/main_logo.png" alt="Terminus DAO" class="logo">
+            </a>
+            <h1>Admin Portal</h1>
+            <div class="admin-header-actions">
+                <span id="userEmail" class="user-email"></span>
+                <button id="logoutBtn" class="btn-logout" style="display: none;">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <!-- Login Section -->
+        <section id="loginSection" class="login-section">
+            <div class="login-card">
+                <h2>Admin Login</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required placeholder="admin@terminusdao.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required placeholder="Enter password">
+                    </div>
+                    <button type="submit" class="btn-primary">Login</button>
+                    <p id="loginError" class="error-message"></p>
+                </form>
+                <div class="login-footer">
+                    <p>Don't have an account? <a href="#" id="showRegister">Register</a></p>
+                </div>
+            </div>
+
+            <!-- Registration Form (hidden by default) -->
+            <div class="login-card" id="registerCard" style="display: none;">
+                <h2>Create Admin Account</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="regEmail">Email</label>
+                        <input type="email" id="regEmail" required placeholder="admin@terminusdao.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Password</label>
+                        <input type="password" id="regPassword" required placeholder="Min 6 characters" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="regPasswordConfirm">Confirm Password</label>
+                        <input type="password" id="regPasswordConfirm" required placeholder="Confirm password">
+                    </div>
+                    <button type="submit" class="btn-primary">Create Account</button>
+                    <p id="registerError" class="error-message"></p>
+                </form>
+                <div class="login-footer">
+                    <p>Already have an account? <a href="#" id="showLogin">Login</a></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section (hidden until logged in) -->
+        <section id="dashboardSection" class="dashboard-section" style="display: none;">
+            <div class="dashboard-container">
+                <!-- Sidebar -->
+                <aside class="dashboard-sidebar">
+                    <nav class="sidebar-nav">
+                        <button class="sidebar-btn active" data-view="events">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Events
+                        </button>
+                        <button class="sidebar-btn" data-view="create">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="16"></line>
+                                <line x1="8" y1="12" x2="16" y2="12"></line>
+                            </svg>
+                            Create Event
+                        </button>
+                    </nav>
+                </aside>
+
+                <!-- Main Content Area -->
+                <div class="dashboard-content">
+                    <!-- Events List View -->
+                    <div id="eventsView" class="dashboard-view">
+                        <div class="view-header">
+                            <h2>All Events</h2>
+                            <button class="btn-primary" onclick="showView('create')">+ New Event</button>
+                        </div>
+                        <div id="adminEventsList" class="admin-events-list">
+                            <!-- Events will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Create/Edit Event View -->
+                    <div id="createView" class="dashboard-view" style="display: none;">
+                        <div class="view-header">
+                            <h2 id="formTitle">Create New Event</h2>
+                        </div>
+                        <form id="eventForm" class="event-form">
+                            <input type="hidden" id="eventId">
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="eventTitle">Event Title *</label>
+                                    <input type="text" id="eventTitle" required placeholder="e.g., Blockchain 101 Workshop">
+                                </div>
+                            </div>
+
+                            <div class="form-row two-col">
+                                <div class="form-group">
+                                    <label for="eventDate">Date *</label>
+                                    <input type="date" id="eventDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventTime">Time *</label>
+                                    <div class="time-picker">
+                                        <select id="eventHour" required>
+                                            <option value="">Hour</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                            <option value="9">9</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                        </select>
+                                        <span>:</span>
+                                        <select id="eventMinute" required>
+                                            <option value="00">00</option>
+                                            <option value="15">15</option>
+                                            <option value="30">30</option>
+                                            <option value="45">45</option>
+                                        </select>
+                                        <select id="eventPeriod" required>
+                                            <option value="AM">AM</option>
+                                            <option value="PM">PM</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="eventLocation">Location *</label>
+                                <input type="text" id="eventLocation" placeholder="e.g., Atlanta Blockchain Center" required>
+                                <small>This will link to Google Maps when displayed</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="eventDescription">Description *</label>
+                                <textarea id="eventDescription" rows="4" required placeholder="Describe your event..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="eventImage">Event Flyer/Image</label>
+                                <div class="image-upload-area" id="imageUploadArea">
+                                    <input type="file" id="eventImage" accept="image/*" hidden>
+                                    <div class="upload-placeholder" id="uploadPlaceholder">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                            <polyline points="21 15 16 10 5 21"></polyline>
+                                        </svg>
+                                        <p>Click or drag to upload image</p>
+                                        <span>PNG, JPG up to 5MB</span>
+                                    </div>
+                                    <div class="image-preview-container" id="imagePreviewContainer" style="display: none;">
+                                        <img id="imagePreview" src="" alt="Event preview">
+                                        <button type="button" class="btn-remove-image" id="removeImage">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row two-col">
+                                <div class="form-group checkbox-group">
+                                    <label>
+                                        <input type="checkbox" id="eventRecurring">
+                                        <span>Recurring Event</span>
+                                    </label>
+                                    <small>Recurring events are always displayed regardless of date</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventLink">External Link (optional)</label>
+                                    <input type="url" id="eventLink" placeholder="https://...">
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" onclick="resetForm(); showView('events');">Cancel</button>
+                                <button type="submit" class="btn-primary" id="submitBtn">Create Event</button>
+                            </div>
+                            <p id="formError" class="error-message"></p>
+                            <p id="formSuccess" class="success-message"></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3>Delete Event</h3>
+            <p>Are you sure you want to delete this event? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <!-- Firebase Config and Admin Script -->
+    <script src="firebase-config.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
