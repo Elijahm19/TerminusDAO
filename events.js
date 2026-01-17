@@ -82,7 +82,8 @@ function getUpcomingEvents(events) {
         if (!event.dateString) {
             return true;
         }
-        const eventDate = new Date(event.dateString);
+        // Parse date as local time (not UTC) to avoid timezone issues
+        const eventDate = new Date(event.dateString + 'T00:00:00');
         return eventDate >= today;
     });
 
