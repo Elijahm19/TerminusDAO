@@ -97,19 +97,28 @@ function getUpcomingEvents(events) {
     return upcomingEvents;
 }
 
-// Generate Google Maps link
-function getGoogleMapsLink(location) {
+// Generate map link (supports Google Maps links, Apple Maps links, or addresses)
+function getMapLink(location) {
     if (!location) return null;
 
-    // If we have coordinates, use them
-    if (location.lat && location.lng) {
-        return `https://www.google.com/maps/search/?api=1&query=${location.lat},${location.lng}`;
+    // If address is provided
+    if (location.address) {
+        // If it's already a URL (Google Maps, Apple Maps, etc.), use it directly
+        if (location.address.startsWith('http://') || location.address.startsWith('https://')) {
+            return location.address;
+        }
+        // Otherwise, create a Google Maps search URL from the address
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.address)}`;
     }
 
-    // Otherwise, search by name/address
-    const searchQuery = location.address || location.name || location;
-    if (typeof searchQuery === 'string') {
-        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`;
+    // Fallback: search by location name
+    if (location.name) {
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.name)}`;
+    }
+
+    // Legacy support: if location is just a string
+    if (typeof location === 'string') {
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
     }
 
     return null;
@@ -147,7 +156,7 @@ async function renderEvents() {
 
         // Get location display name
         const locationName = event.location?.name || event.location || '';
-        const mapsLink = getGoogleMapsLink(event.location);
+        const mapsLink = getMapLink(event.location);
 
         let cardHTML = '';
 

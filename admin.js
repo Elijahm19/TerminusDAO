@@ -252,7 +252,8 @@ async function handleEventSubmit(e) {
             date: document.getElementById('eventDate').value,
             displayTime: formatDisplayTime(),
             location: {
-                name: document.getElementById('eventLocation').value.trim()
+                name: document.getElementById('eventLocation').value.trim(),
+                address: document.getElementById('eventAddress').value.trim() || null
             },
             recurring: document.getElementById('eventRecurring').checked,
             link: document.getElementById('eventLink').value.trim() || null,
@@ -458,6 +459,7 @@ async function editEvent(eventId) {
         // Set location
         if (event.location) {
             document.getElementById('eventLocation').value = event.location.name || event.location || '';
+            document.getElementById('eventAddress').value = event.location.address || '';
         }
 
         // Set image preview if exists
