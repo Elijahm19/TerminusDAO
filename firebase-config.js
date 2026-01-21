@@ -1,6 +1,4 @@
-// Firebase Configuration
-// IMPORTANT: Replace these placeholder values with your actual Firebase project credentials
-// You can find these in your Firebase Console: Project Settings > General > Your Apps > SDK setup and configuration
+// Firebase Configuration (using compat version for script tags)
 
 const firebaseConfig = {
     apiKey: "AIzaSyAGV_0kZZxrjLcq7ZpGAq1GNLAO93Z4wyQ",
@@ -14,12 +12,16 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Initialize services
+// Initialize Firestore
 const db = firebase.firestore();
-const auth = firebase.auth();
-const storage = firebase.storage();
 
-// Export for use in other files
+// Initialize Auth and Storage only if SDKs are loaded (they're only on admin page)
+const auth = typeof firebase.auth === 'function' ? firebase.auth() : null;
+const storage = typeof firebase.storage === 'function' ? firebase.storage() : null;
+
+// Make available globally
 window.db = db;
 window.auth = auth;
 window.storage = storage;
+
+console.log('Firebase initialized successfully');

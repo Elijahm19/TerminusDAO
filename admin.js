@@ -6,23 +6,47 @@ let editingEventId = null;
 let selectedImageFile = null;
 let eventToDelete = null;
 
-// DOM Elements
-const loginSection = document.getElementById('loginSection');
-const dashboardSection = document.getElementById('dashboardSection');
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
-const registerCard = document.getElementById('registerCard');
-const logoutBtn = document.getElementById('logoutBtn');
-const userEmailSpan = document.getElementById('userEmail');
-const eventForm = document.getElementById('eventForm');
-const adminEventsList = document.getElementById('adminEventsList');
+// DOM Elements (initialized after DOM loads)
+let loginSection, dashboardSection, loginForm, registerForm, registerCard;
+let logoutBtn, userEmailSpan, eventForm, adminEventsList;
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('Admin portal initializing...');
+
+    // Check Firebase is loaded
+    if (typeof firebase === 'undefined' || typeof db === 'undefined' || typeof auth === 'undefined') {
+        console.error('Firebase not loaded! Check firebase-config.js');
+        alert('Error: Firebase failed to load. Please refresh the page.');
+        return;
+    }
+    console.log('Firebase loaded successfully');
+
+    // Get DOM elements
+    loginSection = document.getElementById('loginSection');
+    dashboardSection = document.getElementById('dashboardSection');
+    loginForm = document.getElementById('loginForm');
+    registerForm = document.getElementById('registerForm');
+    registerCard = document.getElementById('registerCard');
+    logoutBtn = document.getElementById('logoutBtn');
+    userEmailSpan = document.getElementById('userEmail');
+    eventForm = document.getElementById('eventForm');
+    adminEventsList = document.getElementById('adminEventsList');
+
+    // Verify critical elements exist
+    if (!eventForm) {
+        console.error('Event form not found!');
+        return;
+    }
+
+    console.log('DOM elements loaded, initializing handlers...');
+
     initAuth();
     initFormHandlers();
     initImageUpload();
     initSidebarNavigation();
+
+    console.log('Admin portal ready');
 });
 
 // ==================== AUTHENTICATION ====================
@@ -229,7 +253,26 @@ function handleImageFile(file) {
 // ==================== FORM HANDLERS ====================
 
 function initFormHandlers() {
+    if (!eventForm) {
+        console.error('Cannot init form handlers: eventForm is null');
+        return;
+    }
+
+    // Add submit handler
     eventForm.addEventListener('submit', handleEventSubmit);
+    console.log('Form submit handler attached');
+
+    // Also add click handler to submit button as backup
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', (e) => {
+            // Only handle if form won't naturally submit (e.g., validation issues)
+            if (!eventForm.checkValidity()) {
+                console.log('Form validation failed, triggering report');
+                eventForm.reportValidity();
+            }
+        });
+    }
 }
 
 async function handleEventSubmit(e) {
@@ -238,21 +281,41 @@ async function handleEventSubmit(e) {
     const errorEl = document.getElementById('formError');
     const successEl = document.getElementById('formSuccess');
     const submitBtn = document.getElementById('submitBtn');
+    const isEditing = !!editingEventId;
 
     errorEl.textContent = '';
     successEl.textContent = '';
     submitBtn.disabled = true;
-    submitBtn.textContent = editingEventId ? 'Updating...' : 'Creating...';
+    submitBtn.textContent = isEditing ? 'Updating...' : 'Creating...';
 
     try {
+        // Check if user is authenticated
+        if (!currentUser) {
+            throw new Error('You must be logged in to save events');
+        }
+
         // Gather form data
+        const title = document.getElementById('eventTitle').value.trim();
+        const description = document.getElementById('eventDescription').value.trim();
+        const date = document.getElementById('eventDate').value;
+        const locationName = document.getElementById('eventLocation').value.trim();
+        const hour = document.getElementById('eventHour').value;
+
+        // Validate required fields
+        if (!title || !description || !date || !locationName) {
+            throw new Error('Please fill in all required fields');
+        }
+        if (!hour) {
+            throw new Error('Please select a time for the event');
+        }
+
         const eventData = {
-            title: document.getElementById('eventTitle').value.trim(),
-            description: document.getElementById('eventDescription').value.trim(),
-            date: document.getElementById('eventDate').value,
+            title: title,
+            description: description,
+            date: date,
             displayTime: formatDisplayTime(),
             location: {
-                name: document.getElementById('eventLocation').value.trim(),
+                name: locationName,
                 address: document.getElementById('eventAddress').value.trim() || null
             },
             recurring: document.getElementById('eventRecurring').checked,
@@ -260,19 +323,17 @@ async function handleEventSubmit(e) {
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
 
-        // Validate required fields
-        if (!eventData.title || !eventData.description || !eventData.date || !eventData.location.name) {
-            throw new Error('Please fill in all required fields');
-        }
-
         // Upload image if selected
         if (selectedImageFile) {
+            submitBtn.textContent = 'Uploading image...';
             const imageUrl = await uploadImage(selectedImageFile);
             eventData.imageUrl = imageUrl;
         }
 
         // Save to Firestore
-        if (editingEventId) {
+        submitBtn.textContent = 'Saving...';
+
+        if (isEditing) {
             await db.collection('events').doc(editingEventId).update(eventData);
             successEl.textContent = 'Event updated successfully!';
         } else {
@@ -290,10 +351,11 @@ async function handleEventSubmit(e) {
 
     } catch (error) {
         console.error('Error saving event:', error);
-        errorEl.textContent = error.message || 'Failed to save event. Please try again.';
+        alert('Error: ' + (error.message || error.code || 'Unknown error'));
+        errorEl.textContent = error.message || error.code || 'Failed to save event. Please try again.';
     } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = editingEventId ? 'Update Event' : 'Create Event';
+        submitBtn.textContent = isEditing ? 'Update Event' : 'Create Event';
     }
 }
 
