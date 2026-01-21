@@ -150,7 +150,8 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 Terminus DAO</p>
+            <p>&copy; <span id="copyright-year"></span> Terminus DAO</p>
+            <script>document.getElementById('copyright-year').textContent = new Date().getFullYear();</script>
             <p>
                 <a href="https://atlantachain.io/events" target="_blank" rel="noopener noreferrer">Events</a> |
                 <a href="mailto:Elijah@atlantachain.io">Contact</a>
