@@ -1099,6 +1099,7 @@ header {
         min-width: auto;
         flex: 0 0 auto;
         order: 2;
+        margin-right: 1rem;
     }
 
     .hero-image {
