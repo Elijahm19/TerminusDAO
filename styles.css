@@ -1056,11 +1056,13 @@ header {
 @media (max-width: 768px) {
     .nav-container {
         justify-content: space-between;
+        position: relative;
     }
 
     .nav-brand {
         min-width: auto;
         flex: 0 0 auto;
+        z-index: 2;
     }
 
     .nav-brand .logo {
@@ -1092,14 +1094,16 @@ header {
     .hamburger {
         display: flex;
         order: 3;
+        z-index: 2;
     }
 
     .nav-actions {
-        gap: 0.5rem;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        order: 2;
         min-width: auto;
         flex: 0 0 auto;
-        order: 2;
-        margin-right: 1rem;
     }
 
     .hero-image {
