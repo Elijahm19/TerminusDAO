@@ -381,13 +381,17 @@ header {
     background-color: var(--bg-primary);
     position: relative;
     z-index: 2;
+    min-height: 400px;
+    max-height: 600px;
+    overflow: hidden;
 }
 
 .hero-video {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
     object-fit: cover;
+    object-position: center;
 }
 
 .hero-overlay {
@@ -441,7 +445,7 @@ header {
 }
 
 @media (min-width: 1600px) {
-    .hero-video {
+    .hero-video-container {
         max-height: 700px;
     }
 
@@ -1093,7 +1097,8 @@ header {
         max-height: 350px;
     }
 
-    .hero-video {
+    .hero-video-container {
+        min-height: 300px;
         max-height: 450px;
     }
 
@@ -1128,7 +1133,8 @@ header {
         max-height: 280px;
     }
 
-    .hero-video {
+    .hero-video-container {
+        min-height: 250px;
         max-height: 350px;
     }
 
