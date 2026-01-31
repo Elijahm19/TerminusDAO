@@ -213,7 +213,7 @@ header {
 }
 
 .nav-brand .logo {
-    height: 70px;
+    height: 100px;
     width: auto;
     display: block;
 }
@@ -1064,7 +1064,7 @@ header {
     }
 
     .nav-brand .logo {
-        height: 50px;
+        height: 70px;
     }
 
     .nav-menu {
