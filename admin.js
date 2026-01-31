@@ -7,8 +7,8 @@ let selectedImageFile = null;
 let eventToDelete = null;
 
 // DOM Elements (initialized after DOM loads)
-let loginSection, dashboardSection, loginForm, registerForm, registerCard;
-let logoutBtn, userEmailSpan, eventForm, adminEventsList;
+let loginSection, dashboardSection, loginForm;
+let logoutBtn, homeBtn, userEmailSpan, eventForm, adminEventsList;
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
@@ -26,9 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
     loginSection = document.getElementById('loginSection');
     dashboardSection = document.getElementById('dashboardSection');
     loginForm = document.getElementById('loginForm');
-    registerForm = document.getElementById('registerForm');
-    registerCard = document.getElementById('registerCard');
     logoutBtn = document.getElementById('logoutBtn');
+    homeBtn = document.getElementById('homeBtn');
     userEmailSpan = document.getElementById('userEmail');
     eventForm = document.getElementById('eventForm');
     adminEventsList = document.getElementById('adminEventsList');
@@ -78,43 +77,9 @@ function initAuth() {
         }
     });
 
-    // Register form handler
-    registerForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('regEmail').value;
-        const password = document.getElementById('regPassword').value;
-        const confirmPassword = document.getElementById('regPasswordConfirm').value;
-        const errorEl = document.getElementById('registerError');
-
-        if (password !== confirmPassword) {
-            errorEl.textContent = 'Passwords do not match';
-            return;
-        }
-
-        try {
-            errorEl.textContent = '';
-            await auth.createUserWithEmailAndPassword(email, password);
-        } catch (error) {
-            errorEl.textContent = getAuthErrorMessage(error.code);
-        }
-    });
-
     // Logout handler
     logoutBtn.addEventListener('click', () => {
         auth.signOut();
-    });
-
-    // Toggle between login and register
-    document.getElementById('showRegister').addEventListener('click', (e) => {
-        e.preventDefault();
-        document.querySelector('.login-card:not(#registerCard)').style.display = 'none';
-        registerCard.style.display = 'block';
-    });
-
-    document.getElementById('showLogin').addEventListener('click', (e) => {
-        e.preventDefault();
-        registerCard.style.display = 'none';
-        document.querySelector('.login-card:not(#registerCard)').style.display = 'block';
     });
 }
 
@@ -134,6 +99,7 @@ function showLogin() {
     loginSection.style.display = 'flex';
     dashboardSection.style.display = 'none';
     logoutBtn.style.display = 'none';
+    homeBtn.style.display = 'none';
     userEmailSpan.textContent = '';
 }
 
@@ -141,6 +107,7 @@ function showDashboard() {
     loginSection.style.display = 'none';
     dashboardSection.style.display = 'block';
     logoutBtn.style.display = 'block';
+    homeBtn.style.display = 'inline-block';
     userEmailSpan.textContent = currentUser.email;
 }
 
