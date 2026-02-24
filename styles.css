@@ -254,6 +254,24 @@ header {
     width: 100%;
 }
 
+.nav-menu .swc-btn {
+    background-color: #f59e0b;
+    color: #000 !important;
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.nav-menu .swc-btn:hover {
+    background-color: #d97706;
+    color: #000 !important;
+}
+
+.nav-menu .swc-btn::after {
+    display: none;
+}
+
 .nav-actions {
     display: flex;
     align-items: center;
